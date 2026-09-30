@@ -23,6 +23,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Assemble kit
         shell: pwsh
+        env:
+          PYTHONIOENCODING: utf-8
         run: |
           $kit = 'package/MarryADeepOne'
           New-Item -ItemType Directory -Force "$kit/translation", "$kit/fonts" | Out-Null
