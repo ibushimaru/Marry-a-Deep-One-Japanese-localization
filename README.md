@@ -2,6 +2,8 @@
 
 Steam版『Marry a Deep One』の文字列を日本語に差し替えるためのキットです。ゲーム本体は含みません。`translation/sample_ja.csv` に156件の試訳を収録しています。全訳ではなく、未訳の箇所は英語のまま表示されます。`translation/translation.csv` は翻訳作業用の空欄CSVです。
 
+GitHubから入手する場合は、[Releases](https://github.com/ibushimaru/Marry-a-Deep-One-Japanese-localization/releases) の `Marry-a-Deep-One-Japanese-kit.zip` をダウンロードしてください。GitHubの「Code → Download ZIP」はソースコード用で、実行ファイルを含みません。
+
 ## サンプル訳をゲームに入れる
 
 1. Steam版ゲームをインストールし、ゲームを終了します。すでに別のMODを入れている場合は、Steamの「インストール済みファイルの整合性を確認」で原本に戻します。
