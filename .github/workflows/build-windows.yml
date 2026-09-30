@@ -24,6 +24,7 @@ jobs:
       - name: Assemble kit
         shell: pwsh
         env:
+          MARRY_UTF8_CONSOLE: '1'
           PYTHONIOENCODING: utf-8
           PYTHONUTF8: '1'
         run: |

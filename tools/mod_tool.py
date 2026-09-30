@@ -14,6 +14,10 @@ from collections import Counter
 from contextlib import redirect_stdout
 from pathlib import Path
 
+if os.environ.get("MARRY_UTF8_CONSOLE") == "1":
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+
 ROOT = (Path(sys.executable).resolve().parent if getattr(sys, "frozen", False)
         else Path(__file__).resolve().parent.parent)
 SOURCE_CSV = ROOT / "translation" / "translation.csv"
