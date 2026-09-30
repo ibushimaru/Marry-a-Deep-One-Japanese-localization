@@ -25,7 +25,10 @@ jobs:
         shell: pwsh
         env:
           PYTHONIOENCODING: utf-8
+          PYTHONUTF8: '1'
         run: |
+          chcp 65001 | Out-Null
+          [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
           $kit = 'package/MarryADeepOne'
           New-Item -ItemType Directory -Force "$kit/translation", "$kit/fonts" | Out-Null
           Copy-Item README.md, START.bat, dist/MarryTool.exe $kit
