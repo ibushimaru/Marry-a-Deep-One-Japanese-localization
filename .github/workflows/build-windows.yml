@@ -1,0 +1,41 @@
+name: Build Windows kit
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Install build dependencies
+        run: python -m pip install -r requirements.txt pyinstaller
+      - name: Build executable
+        shell: pwsh
+        run: |
+          python -m PyInstaller --noconfirm --clean --onefile --name MarryTool --paths tools --collect-data budoux --distpath dist --workpath build/pyinstaller --specpath build/spec tools/mod_tool.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Assemble kit
+        shell: pwsh
+        run: |
+          $kit = 'package/MarryADeepOne'
+          New-Item -ItemType Directory -Force "$kit/translation", "$kit/fonts" | Out-Null
+          Copy-Item README.md, START.bat, dist/MarryTool.exe $kit
+          Copy-Item translation/template.csv, translation/sample_ja.csv, translation/translation.csv "$kit/translation"
+          Copy-Item fonts/*.ttf, fonts/OFL.txt, fonts/UDEVGothic-LICENSE.txt "$kit/fonts"
+          & "$kit/MarryTool.exe" check --csv "$kit/translation/sample_ja.csv"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & "$kit/MarryTool.exe" check --csv "$kit/translation/translation.csv"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Compress-Archive -Path $kit -DestinationPath 'package/Marry-a-Deep-One-Japanese-kit.zip'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Marry-a-Deep-One-Japanese-kit
+          path: package/Marry-a-Deep-One-Japanese-kit.zip
+          if-no-files-found: error

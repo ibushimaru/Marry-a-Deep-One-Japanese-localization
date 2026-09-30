@@ -1,0 +1,8 @@
+# ゲーム本体・生成物（サイズが大きく、原本は Steam から再取得できる）
+build/
+game_backup/
+.venv/
+workspace/
+extracted/fonts/texpage_*.png
+__pycache__/
+*.pyc
