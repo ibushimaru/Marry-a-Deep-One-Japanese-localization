@@ -189,34 +189,19 @@ def main():
                         if r:
                             route, width, font = r
                         break
-            estimated = False
             if route is None:
                 if " " in s.strip() and len(s) > 20:
                     # 文章なら物語文としてイベント経路（実行時折り返し）を既定にする。
                     # 物語・日誌の類はほぼすべてイベントUIに流れるため実害が小さい。
                     route, width, font = "event", EVENT_WIDTH, EVENT_FONT
-                    estimated = True
                 elif name in LANG_SCRIPTS:
                     # 言語テーブルにある時点で表示文字列と確定しているので、
                     # 経路が追えなくてもラベルとして必ず載せる（落とすと翻訳漏れになる）
                     route, width, font = "label", None, "font_l"
-                    estimated = True
                 else:
                     continue
             seen.add(idx)
-
-            note = []
-            if estimated:
-                note.append("描画経路は推定（物語文としてイベントUI想定）")
-            if name.startswith("gml_Script_s_GENERATE_name"):
-                note.append("固有名詞。カタカナ化するかは方針次第")
-            if refs[idx] > 1:
-                note.append(f"内部値と共有の疑い（{refs[idx]}箇所で参照）")
-            if concat:
-                note.append("実行時に別の値が連結される。語順に注意し、改行は手動で入れること")
             ph = PLACEHOLDER.findall(s)
-            if ph:
-                note.append("プレースホルダーはそのまま残す")
 
             # 固有名詞は本文ではないので経路の意味がない
             if category_of(name) == "name":
@@ -234,13 +219,12 @@ def main():
                 "translate": "no" if refs[idx] > 1 else "yes",
                 "en": s,
                 "ja": "",
-                "note": " / ".join(note),
             })
 
     rows.sort(key=lambda r: (r["category"], r["script"], r["id"]))
     OUT.parent.mkdir(exist_ok=True)
     cols = ["id", "category", "script", "route", "width_px", "font",
-            "concat", "placeholders", "translate", "en", "ja", "note"]
+            "concat", "placeholders", "translate", "en", "ja"]
     # Excel で開けるよう BOM 付き UTF-8
     with open(OUT, "w", newline="", encoding="utf-8-sig") as f:
         w = csv.DictWriter(f, fieldnames=cols)
