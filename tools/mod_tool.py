@@ -111,7 +111,7 @@ def locate(args):
 def current_game(args):
     chosen = args.game or state().get("game")
     if not chosen:
-        raise ValueError("ゲームの場所が未設定です。最初に init --game <ゲームフォルダー> を実行してください")
+        raise ValueError("ゲームフォルダーが未設定です。最初に init --game <ゲームフォルダー> を実行してください")
     target = game_file(chosen)
     if not target.is_file():
         raise ValueError(f"data.win が見つかりません: {target}")
@@ -120,7 +120,7 @@ def current_game(args):
 
 def ensure_backup():
     if not BACKUP.is_file() or sha256(BACKUP) != EXPECTED_SHA256:
-        raise ValueError("原本バックアップがありません／対応版と異なります。init を実行してください")
+        raise ValueError("原本のバックアップが見つからないか、対応版と一致しません。init を実行してください")
 
 
 def init(args):
@@ -131,7 +131,7 @@ def init(args):
         ensure_backup()
     else:
         if sha256(target) != EXPECTED_SHA256:
-            raise ValueError("ゲームが対応版の原本ではありません。Steamの整合性確認後に再実行してください")
+            raise ValueError("ゲームのdata.winが対応版の原本ではありません。Steamでファイルの整合性を確認してから、もう一度実行してください")
         BACKUP.parent.mkdir(exist_ok=True)
         shutil.copy2(target, BACKUP)
         ensure_backup()
@@ -238,7 +238,7 @@ def install(args):
     value = state()
     current = sha256(target)
     if current not in (EXPECTED_SHA256, value.get("installed_sha256")):
-        raise ValueError("ゲームファイルが別の版／MODです。上書きせず停止しました")
+        raise ValueError("ゲームのdata.winが対応版または前回反映したファイルと一致しません。上書きはしていません")
     replace_game(target, BUILD)
     value["installed_sha256"] = sha256(BUILD)
     save_state(value)
@@ -252,7 +252,7 @@ def restore(args):
         raise ValueError("ゲームが起動中です。終了してから再実行してください")
     current = sha256(target)
     if current not in (EXPECTED_SHA256, state().get("installed_sha256")):
-        raise ValueError("ゲームファイルが別の版／MODです。上書きせず停止しました")
+        raise ValueError("ゲームのdata.winが対応版または前回反映したファイルと一致しません。上書きはしていません")
     replace_game(target, BACKUP)
     print(f"原本に戻しました: {target}")
 
@@ -262,7 +262,7 @@ def menu():
         paths = discover_game_paths()
         if len(paths) == 1:
             path = str(paths[0])
-            print(f"Steamからゲームを検出: {path}")
+            print(f"Steamライブラリでゲームが見つかりました: {path}")
         elif len(paths) > 1:
             print("ゲームが複数見つかりました:")
             for index, found in enumerate(paths, 1):
@@ -284,7 +284,7 @@ def menu():
                 if game_running(current_game(argparse.Namespace(game=None))):
                     raise ValueError("ゲームを終了してから反映してください")
                 selected = SAMPLE_CSV if choice == "1" else SOURCE_CSV
-                print("日本語化データを作成しています。しばらくお待ちください...")
+                print("日本語化データを作成中です。しばらくお待ちください。")
                 details = io.StringIO()
                 try:
                     with redirect_stdout(details):
